@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 from playwright.sync_api import BrowserContext, Page
 
-from ..lib.chatbots import CohereChatBot, CopilotChatBot
+from ..lib.chatbots import ChatbotInterface, CohereChatBot, CopilotChatBot
 
 
 @pytest.fixture(scope="module")
@@ -25,6 +25,13 @@ def chatbot(request):
         return CopilotChatBot(load_credentials_from_env=True)
     else:
         raise ValueError(f"Unknown test directory: {test_dir}")
+
+
+@pytest.fixture(scope="module")
+def chat_page(authenticated_session: Page, chatbot: ChatbotInterface):
+    page = chatbot.open_chat_page(authenticated_session)
+    yield page
+    page.close()
 
 
 @pytest.fixture(scope="module")
